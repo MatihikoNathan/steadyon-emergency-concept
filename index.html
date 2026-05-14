@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SteadyOn — Emergency Planning Module</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eceae4;
+    --text-primary: #1a1a18;
+    --text-secondary: #5f5e5a;
+    --text-tertiary: #9a9890;
+    --border-light: rgba(0,0,0,0.1);
+    --border-med: rgba(0,0,0,0.18);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --red-bg: #FCEBEB;
+    --red-text: #A32D2D;
+    --red-border: #F7C1C1;
+    --red-dark: #791F1F;
+    --red-mid: #E24B4A;
+    --amber-bg: #FAEEDA;
+    --amber-text: #854F0B;
+    --green-bg: #EAF3DE;
+    --green-text: #3B6D11;
+    --green-mid: #1D9E75;
+    --green-light: #9FE1CB;
+    --green-dark: #085041;
+    --blue-bg: #E6F1FB;
+    --blue-text: #185FA5;
+    --blue-light: #B5D4F4;
+    --blue-dark: #0C447C;
+    --purple-bg: #EEEDFE;
+    --purple-text: #534AB7;
+    --purple-light: #CECBF6;
+    --purple-dark: #3C3489;
+    --teal-light: #9FE1CB;
+    --teal-dark: #085041;
+    --teal-bg: #E1F5EE;
+    --amber-light: #FAC775;
+    --amber-dark: #633806;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #e8e6df;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .device-wrap {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .device-label {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .device-label .app-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #888;
+    text-transform: uppercase;
+  }
+
+  .device-label .module-name {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 2px;
+  }
+
+  .phone-frame {
+    background: var(--bg-primary);
+    border-radius: 32px;
+    border: 1px solid rgba(0,0,0,0.12);
+    overflow: hidden;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .status-bar {
+    background: var(--bg-primary);
+    padding: 12px 20px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 0.5px solid var(--border-light);
+  }
+
+  .status-icons { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text-primary); }
+
+  .app-content {
+    padding: 1rem 1.125rem 2rem;
+    min-height: 600px;
+    max-height: 750px;
+    overflow-y: auto;
+    background: var(--bg-primary);
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .page-title { font-size: 20px; font-weight: 600; color: var(--text-primary); }
+  .page-sub { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 9px;
+    border-radius: var(--radius-md);
+    white-space: nowrap;
+  }
+  .badge-red { background: var(--red-bg); color: var(--red-text); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber-text); }
+  .badge-green { background: var(--green-bg); color: var(--green-text); }
+  .badge-blue { background: var(--blue-bg); color: var(--blue-text); }
+  .badge-purple { background: var(--purple-bg); color: var(--purple-text); }
+
+  .big-red-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--red-text);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: var(--red-bg);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.01em;
+  }
+  .big-red-btn:hover { background: var(--red-dark); }
+  .big-red-btn:active { transform: scale(0.99); }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  .stat {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 11px 8px;
+    text-align: center;
+  }
+  .stat-num { font-size: 21px; font-weight: 600; color: var(--text-primary); }
+  .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+  .tab-bar {
+    display: flex;
+    gap: 3px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    margin-bottom: 1.25rem;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 7px 2px;
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-weight: 400;
+  }
+  .tab.active {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-weight: 500;
+    border: 0.5px solid var(--border-light);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 0.875rem 1rem;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .card:hover { border-color: var(--border-med); }
+
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+  .scenario-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 0.875rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+  }
+  .scenario-card:hover { background: var(--bg-secondary); }
+  .scenario-card.has-plan { border-color: var(--teal-light); }
+  .scenario-icon { font-size: 22px; margin-bottom: 6px; color: var(--text-secondary); }
+  .scenario-label { font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 0.5px solid var(--border-light);
+  }
+  .contact-row:last-child { border-bottom: none; }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .av-teal { background: var(--teal-light); color: var(--teal-dark); }
+  .av-blue { background: var(--blue-light); color: var(--blue-dark); }
+  .av-purple { background: var(--purple-light); color: var(--purple-dark); }
+  .av-amber { background: var(--amber-light); color: var(--amber-dark); }
+
+  .contact-info { flex: 1; min-width: 0; }
+  .contact-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .contact-role { font-size: 11px; color: var(--text-secondary); }
+
+  .contact-actions { display: flex; gap: 5px; }
+
+  .icon-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-light);
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  .icon-btn:hover { background: var(--bg-secondary); }
+  .icon-btn.green { background: var(--teal-bg); border-color: var(--teal-light); color: var(--teal-dark); }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 1.25rem;
+    border-bottom: 0.5px solid var(--border-light);
+    margin-bottom: 1.25rem;
+  }
+  .nav-back {
+    background: none;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-md);
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+  }
+  .nav-back:hover { background: var(--bg-secondary); }
+  .screen-title { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+
+  .step-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--border-light);
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--purple-bg);
+    color: var(--purple-text);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-body { padding-top: 3px; }
+  .step-text { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+  .step-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+  .progress-bar { height: 4px; background: var(--border-light); border-radius: 2px; margin-bottom: 1.25rem; }
+  .progress-fill { height: 100%; background: var(--green-mid); border-radius: 2px; }
+
+  .live-header {
+    background: var(--red-bg);
+    border: 0.5px solid var(--red-border);
+    border-radius: var(--radius-lg);
+    padding: 0.875rem 1rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .live-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--red-mid); flex-shrink: 0;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  .live-title { font-size: 13px; font-weight: 600; color: var(--red-text); }
+  .live-sub { font-size: 11px; color: #993C1D; }
+
+  .alert-bar {
+    background: var(--red-bg);
+    border-left: 3px solid var(--red-mid);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    padding: 9px 11px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--red-dark);
+    line-height: 1.5;
+  }
+
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 9px 0;
+    border-bottom: 0.5px solid var(--border-light);
+    cursor: pointer;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .checkbox {
+    width: 19px; height: 19px;
+    border-radius: 5px;
+    border: 0.5px solid var(--border-med);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    margin-top: 1px;
+  }
+  .checkbox.checked { background: var(--green-mid); border-color: var(--green-mid); color: white; }
+  .cl-text { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+  .cl-text.done { color: var(--text-tertiary); text-decoration: line-through; }
+
+  .drill-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 0.5px solid var(--border-light);
+  }
+  .drill-row:last-child { border-bottom: none; }
+  .drill-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .drill-meta { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+  .pill-btn {
+    font-size: 11px;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-md);
+    padding: 4px 10px;
+    background: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+  .pill-btn:hover { background: var(--bg-secondary); }
+
+  .risk-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; }
+  .risk-label { font-size: 12px; color: var(--text-primary); width: 80px; flex-shrink: 0; }
+  .risk-bar-wrap { flex: 1; height: 5px; background: var(--border-light); border-radius: 3px; overflow: hidden; }
+  .risk-bar { height: 100%; border-radius: 3px; }
+
+  .add-btn {
+    width: 100%; padding: 9px;
+    border: 0.5px dashed var(--border-med);
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    margin-top: 6px; font-family: inherit;
+  }
+  .add-btn:hover { background: var(--bg-secondary); }
+
+  .ghost-btn {
+    width: 100%; margin-top: 10px;
+    padding: 10px;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-md);
+    background: none;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-family: inherit;
+  }
+  .ghost-btn:hover { background: var(--bg-secondary); }
+
+  .end-btn {
+    width: 100%; margin-top: 10px; padding: 12px;
+    border: 0.5px solid var(--red-border);
+    border-radius: var(--radius-md);
+    background: var(--red-bg);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    color: var(--red-text);
+    font-family: inherit;
+  }
+  .end-btn:hover { background: #f9dada; }
+
+  .info-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  .bcp-card {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+  }
+  .bcp-title { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .bcp-sub { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<div class="device-wrap">
+  <div class="device-label">
+    <div class="app-name">SteadyOn</div>
+    <div class="module-name">Emergency Planning Module · Concept</div>
+  </div>
+
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="status-icons">
+        <i class="ti ti-wifi"></i>
+        <i class="ti ti-battery-2"></i>
+      </div>
+    </div>
+
+    <div class="app-content" id="app">
+
+      <!-- HOME -->
+      <div id="screen-home" class="screen active">
+        <div class="page-header">
+          <div>
+            <div class="page-title">Emergency planning</div>
+            <div class="page-sub">Acme Manufacturing Ltd</div>
+          </div>
+          <span class="badge badge-green"><i class="ti ti-shield-check"></i> 78% ready</span>
+        </div>
+
+        <button class="big-red-btn" onclick="show('screen-live')">
+          <i class="ti ti-alert-triangle"></i>
+          Emergency happening now
+        </button>
+
+        <div class="stat-row">
+          <div class="stat"><div class="stat-num">6</div><div class="stat-label">Plans ready</div></div>
+          <div class="stat"><div class="stat-num">24</div><div class="stat-label">Contacts</div></div>
+          <div class="stat"><div class="stat-num">14d</div><div class="stat-label">Next drill</div></div>
+        </div>
+
+        <div class="tab-bar">
+          <button class="tab active" onclick="tab('plans', this)">Plans</button>
+          <button class="tab" onclick="tab('contacts', this)">Contacts</button>
+          <button class="tab" onclick="tab('drills', this)">Drills</button>
+          <button class="tab" onclick="tab('risk', this)">Risk</button>
+        </div>
+
+        <!-- PLANS -->
+        <div id="tab-plans" class="tab-content active">
+          <p class="section-label">Emergency scenarios</p>
+          <div class="scenario-grid">
+            <div class="scenario-card has-plan" onclick="show('screen-plan')">
+              <div class="scenario-icon"><i class="ti ti-flame"></i></div>
+              <div class="scenario-label">Fire</div>
+              <span class="badge badge-green" style="font-size:10px;">Ready</span>
+            </div>
+            <div class="scenario-card has-plan" onclick="show('screen-plan')">
+              <div class="scenario-icon"><i class="ti ti-ripple"></i></div>
+              <div class="scenario-label">Earthquake</div>
+              <span class="badge badge-green" style="font-size:10px;">Ready</span>
+            </div>
+            <div class="scenario-card has-plan" onclick="show('screen-plan')">
+              <div class="scenario-icon"><i class="ti ti-droplet"></i></div>
+              <div class="scenario-label">Flood</div>
+              <span class="badge badge-amber" style="font-size:10px;">Draft</span>
+            </div>
+            <div class="scenario-card" onclick="show('screen-plan')">
+              <div class="scenario-icon"><i class="ti ti-heart-rate-monitor"></i></div>
+              <div class="scenario-label">Medical</div>
+              <span class="badge badge-red" style="font-size:10px;">Missing</span>
+            </div>
+            <div class="scenario-card has-plan" onclick="show('screen-plan')">
+              <div class="scenario-icon"><i class="ti ti-bolt"></i></div>
+              <div class="scenario-label">Power out</div>
+              <span class="badge badge-green" style="font-size:10px;">Ready</span>
+            </div>
+            <div class="scenario-card" onclick="show('screen-plan')">
+              <div class="scenario-icon"><i class="ti ti-plus"></i></div>
+              <div class="scenario-label">Add new</div>
+              <span style="font-size:10px; color:var(--text-tertiary);">Custom</span>
+            </div>
+          </div>
+          <p class="section-label">Documents</p>
+          <div class="card bcp-card" onclick="show('screen-plan')">
+            <div><div class="bcp-title">Business Continuity Plan</div><div class="bcp-sub">Last updated 3 weeks ago</div></div>
+            <i class="ti ti-chevron-right" style="color:var(--text-tertiary);"></i>
+          </div>
+          <div class="card bcp-card">
+            <div><div class="bcp-title">Evacuation maps</div><div class="bcp-sub">3 floors · Assembly: Car Park B</div></div>
+            <i class="ti ti-chevron-right" style="color:var(--text-tertiary);"></i>
+          </div>
+        </div>
+
+        <!-- CONTACTS -->
+        <div id="tab-contacts" class="tab-content">
+          <p class="section-label">Emergency contacts</p>
+          <div class="card" style="padding:0.75rem 1rem; cursor:default;">
+            <div class="contact-row">
+              <div class="avatar av-teal">SR</div>
+              <div class="contact-info"><div class="contact-name">Sarah Reynolds</div><div class="contact-role">Chief Warden · Floor 1</div></div>
+              <div class="contact-actions">
+                <button class="icon-btn"><i class="ti ti-phone"></i></button>
+                <button class="icon-btn"><i class="ti ti-message"></i></button>
+              </div>
+            </div>
+            <div class="contact-row">
+              <div class="avatar av-blue">MK</div>
+              <div class="contact-info"><div class="contact-name">Marcus Kim</div><div class="contact-role">Deputy Warden · Floor 2</div></div>
+              <div class="contact-actions">
+                <button class="icon-btn"><i class="ti ti-phone"></i></button>
+                <button class="icon-btn"><i class="ti ti-message"></i></button>
+              </div>
+            </div>
+            <div class="contact-row">
+              <div class="avatar av-purple">JP</div>
+              <div class="contact-info"><div class="contact-name">Julia Park</div><div class="contact-role">First Aid Officer</div></div>
+              <div class="contact-actions">
+                <button class="icon-btn"><i class="ti ti-phone"></i></button>
+                <button class="icon-btn"><i class="ti ti-message"></i></button>
+              </div>
+            </div>
+            <div class="contact-row">
+              <div class="avatar av-amber">DT</div>
+              <div class="contact-info"><div class="contact-name">Dave Torres</div><div class="contact-role">Facilities Manager</div></div>
+              <div class="contact-actions">
+                <button class="icon-btn"><i class="ti ti-phone"></i></button>
+                <button class="icon-btn"><i class="ti ti-message"></i></button>
+              </div>
+            </div>
+          </div>
+          <p class="section-label" style="margin-top:1rem;">External services</p>
+          <div class="card" style="padding:0.75rem 1rem; cursor:default;">
+            <div class="contact-row">
+              <div class="avatar" style="background:var(--red-bg); color:var(--red-text); font-size:11px; font-weight:700;">111</div>
+              <div class="contact-info"><div class="contact-name">NZ Emergency</div><div class="contact-role">Police, Fire, Ambulance</div></div>
+              <button class="icon-btn" style="background:var(--red-bg); border-color:var(--red-border); color:var(--red-text);"><i class="ti ti-phone"></i></button>
+            </div>
+            <div class="contact-row">
+              <div class="avatar av-blue" style="font-size:10px;">GNS</div>
+              <div class="contact-info"><div class="contact-name">GeoNet / NIWA</div><div class="contact-role">Earthquake & weather alerts</div></div>
+              <button class="icon-btn"><i class="ti ti-external-link"></i></button>
+            </div>
+          </div>
+          <button class="add-btn"><i class="ti ti-plus"></i> Add contact</button>
+        </div>
+
+        <!-- DRILLS -->
+        <div id="tab-drills" class="tab-content">
+          <p class="section-label">Upcoming drills</p>
+          <div class="card" style="padding:0.75rem 1rem; cursor:default;">
+            <div class="drill-row">
+              <div><div class="drill-name">Fire evacuation</div><div class="drill-meta">29 May · 10:00am · All staff</div></div>
+              <button class="pill-btn">Manage</button>
+            </div>
+            <div class="drill-row">
+              <div><div class="drill-name">Earthquake — drop & cover</div><div class="drill-meta">15 July · Warehouse team</div></div>
+              <button class="pill-btn">Manage</button>
+            </div>
+          </div>
+          <p class="section-label" style="margin-top:1rem;">Past drills</p>
+          <div class="card" style="padding:0.75rem 1rem; cursor:default;">
+            <div class="drill-row">
+              <div><div class="drill-name">Fire evacuation</div><div class="drill-meta">28 Feb · 4m 32s · <span style="color:var(--green-text);">Pass</span></div></div>
+              <button class="pill-btn">Report</button>
+            </div>
+            <div class="drill-row">
+              <div><div class="drill-name">Lockdown simulation</div><div class="drill-meta">14 Jan · 7m 15s · <span style="color:var(--amber-text);">Review needed</span></div></div>
+              <button class="pill-btn">Report</button>
+            </div>
+          </div>
+          <button class="add-btn"><i class="ti ti-plus"></i> Schedule a drill</button>
+        </div>
+
+        <!-- RISK -->
+        <div id="tab-risk" class="tab-content">
+          <p class="section-label">Site risk profile</p>
+          <div class="card" style="cursor:default;">
+            <div class="risk-row">
+              <div class="risk-label">Fire</div>
+              <div class="risk-bar-wrap"><div class="risk-bar" style="width:75%; background:#E24B4A;"></div></div>
+              <span class="badge badge-red" style="width:54px; justify-content:center; font-size:10px;">High</span>
+            </div>
+            <div class="risk-row">
+              <div class="risk-label">Earthquake</div>
+              <div class="risk-bar-wrap"><div class="risk-bar" style="width:82%; background:#E24B4A;"></div></div>
+              <span class="badge badge-red" style="width:54px; justify-content:center; font-size:10px;">High</span>
+            </div>
+            <div class="risk-row">
+              <div class="risk-label">Flood</div>
+              <div class="risk-bar-wrap"><div class="risk-bar" style="width:35%; background:#EF9F27;"></div></div>
+              <span class="badge badge-amber" style="width:54px; justify-content:center; font-size:10px;">Medium</span>
+            </div>
+            <div class="risk-row">
+              <div class="risk-label">Medical</div>
+              <div class="risk-bar-wrap"><div class="risk-bar" style="width:50%; background:#EF9F27;"></div></div>
+              <span class="badge badge-amber" style="width:54px; justify-content:center; font-size:10px;">Medium</span>
+            </div>
+            <div class="risk-row">
+              <div class="risk-label">Robbery</div>
+              <div class="risk-bar-wrap"><div class="risk-bar" style="width:18%; background:#639922;"></div></div>
+              <span class="badge badge-green" style="width:54px; justify-content:center; font-size:10px;">Low</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <i class="ti ti-map-pin" style="font-size:13px; vertical-align:-1px; margin-right:3px;"></i>
+            Risk profile is based on your Auckland location, using GNS Science seismic and volcanic hazard data.
+          </div>
+        </div>
+      </div>
+
+      <!-- PLAN DETAIL -->
+      <div id="screen-plan" class="screen">
+        <div class="nav">
+          <button class="nav-back" onclick="show('screen-home')"><i class="ti ti-arrow-left"></i> Back</button>
+          <span class="screen-title">Fire — response plan</span>
+        </div>
+        <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px;">
+          <span class="badge badge-green"><i class="ti ti-shield-check"></i> Complete</span>
+          <span class="badge badge-blue">Reviewed 2 weeks ago</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%;"></div></div>
+
+        <p class="section-label">Response steps</p>
+        <div class="card" style="padding:0.75rem 1rem; cursor:default;">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-text">Activate the nearest fire alarm pull station</div>
+              <div class="step-sub">Located at each stairwell entrance</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-text">Call 111 and confirm building address</div>
+              <div class="step-sub">Address card: kitchen & reception</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-text">Wardens sweep floors and guide everyone to Car Park B</div>
+              <div class="step-sub">Mobility-impaired staff wait at stairwell refuge points</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-text">Chief Warden takes roll call and reports to Fire Service</div>
+              <div class="step-sub">Register is in the red folder at reception</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-text">Do not re-enter until cleared by Fire Service</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="section-label" style="margin-top:1rem;">Key people</p>
+        <div class="card" style="padding:0.75rem 1rem; cursor:default;">
+          <div class="contact-row">
+            <div class="avatar av-teal">SR</div>
+            <div class="contact-info"><div class="contact-name">Sarah Reynolds</div><div class="contact-role">Chief Warden</div></div>
+            <button class="icon-btn green"><i class="ti ti-phone"></i></button>
+          </div>
+          <div class="contact-row">
+            <div class="avatar av-blue">MK</div>
+            <div class="contact-info"><div class="contact-name">Marcus Kim</div><div class="contact-role">Deputy Warden</div></div>
+            <button class="icon-btn"><i class="ti ti-phone"></i></button>
+          </div>
+        </div>
+
+        <button class="ghost-btn" onclick="show('screen-home')">
+          <i class="ti ti-player-play"></i> Run a drill for this plan
+        </button>
+      </div>
+
+      <!-- LIVE EMERGENCY -->
+      <div id="screen-live" class="screen">
+        <div class="nav">
+          <button class="nav-back" onclick="show('screen-home')"><i class="ti ti-arrow-left"></i> Cancel</button>
+          <span class="screen-title">Live response</span>
+        </div>
+
+        <div class="live-header">
+          <div class="live-dot"></div>
+          <div>
+            <div class="live-title">Emergency active</div>
+            <div class="live-sub">Started 2 min ago · Fire · Building A</div>
+          </div>
+        </div>
+
+        <div class="alert-bar">
+          <i class="ti ti-phone" style="vertical-align:-2px; margin-right:3px;"></i>
+          <strong>111 called</strong> at 14:32 — confirm your address: 47 Wiri Station Rd, Auckland
+        </div>
+
+        <p class="section-label">Your checklist — Chief Warden</p>
+        <div class="card" style="padding:0.75rem 1rem; cursor:default;" id="live-list">
+          <div class="checklist-item" onclick="toggleCheck(0)">
+            <div class="checkbox checked" id="cb0"><i class="ti ti-check"></i></div>
+            <div class="cl-text done" id="ct0">Alarm activated</div>
+          </div>
+          <div class="checklist-item" onclick="toggleCheck(1)">
+            <div class="checkbox checked" id="cb1"><i class="ti ti-check"></i></div>
+            <div class="cl-text done" id="ct1">111 called</div>
+          </div>
+          <div class="checklist-item" onclick="toggleCheck(2)">
+            <div class="checkbox" id="cb2"></div>
+            <div class="cl-text" id="ct2">All wardens notified and sweeping floors</div>
+          </div>
+          <div class="checklist-item" onclick="toggleCheck(3)">
+            <div class="checkbox" id="cb3"></div>
+            <div class="cl-text" id="ct3">All staff accounted for at assembly point</div>
+          </div>
+          <div class="checklist-item" onclick="toggleCheck(4)">
+            <div class="checkbox" id="cb4"></div>
+            <div class="cl-text" id="ct4">Reported to Fire Service on arrival</div>
+          </div>
+        </div>
+
+        <p class="section-label" style="margin-top:1rem;">Quick contact</p>
+        <div class="card" style="padding:0.75rem 1rem; cursor:default;">
+          <div class="contact-row">
+            <div class="avatar av-teal">SR</div>
+            <div class="contact-info"><div class="contact-name">Sarah Reynolds</div><div class="contact-role">Chief Warden</div></div>
+            <button class="icon-btn green"><i class="ti ti-phone"></i></button>
+          </div>
+          <div class="contact-row">
+            <div class="avatar av-blue">MK</div>
+            <div class="contact-info"><div class="contact-name">Marcus Kim</div><div class="contact-role">Deputy Warden</div></div>
+            <button class="icon-btn"><i class="ti ti-phone"></i></button>
+          </div>
+        </div>
+
+        <button class="end-btn" onclick="show('screen-home')">
+          End emergency · Write incident report
+        </button>
+      </div>
+
+    </div><!-- /app-content -->
+  </div><!-- /phone-frame -->
+
+  <div style="text-align:center; margin-top:1rem; font-size:11px; color:#aaa;">
+    Interactive concept · Tap to explore
+  </div>
+</div>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('app').scrollTop = 0;
+  }
+
+  function tab(name, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  function toggleCheck(i) {
+    const cb = document.getElementById('cb' + i);
+    const ct = document.getElementById('ct' + i);
+    if (cb.classList.contains('checked')) {
+      cb.classList.remove('checked');
+      cb.innerHTML = '';
+      ct.classList.remove('done');
+    } else {
+      cb.classList.add('checked');
+      cb.innerHTML = '<i class="ti ti-check"></i>';
+      ct.classList.add('done');
+    }
+  }
+</script>
+</body>
+</html>
